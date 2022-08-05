@@ -164,6 +164,39 @@ npm install && npm start
 
 - That is all! Isn't this WAAAAAY easier than the old redux. And moreover, incredibly similar to useReducer and contextAPI?
 
-11. REDUX TOOLKIT ASYNC W/THUNK
+11. REDUX TOOLKIT createAsyncThunk
 
-- TODO
+- To use async with Redux Toolkit we need to get import createAsyncThunk from the main redux package in the file that we are going to use it. We are setting everything up in our slices so it would make sense to create our async function there and then grab it and use it from the store with useSelector in the client side where we are going to use. createAsyncThunk is a function that will help with async functionality.
+
+- depending on your approach you can declare your URL (which is normally best practice) or simply hard code it into the fetch function we are going to use later. In our case we are using mock data in a json file so our URL will be within the project.
+
+- Now, to use createAsyncThunk...remember it is a function, and is looking for two things as arguments. The type/action and a callback function. So let's create a variable whose value will be our createAsyncThunk function and pass the arguments needed. Because I need items for the cart, would make sense to make of type 'cart' and action 'getCartItems'
+
+- Inside your callback function, what we are going to do is to return our fetch(url) with appropiates res and erro handling as we normally do in a fetch request.
+  See: https://redux-toolkit.js.org/usage/usage-guide#exporting-and-using-slices
+
+- So far so good. Now, question is...where are we going to use this inside the slice? Well...if you read the links I put here, you will have notice that createSlice have another property called 'extraReducers'. This property, as per the docs, is useful for when a slice needs to handle actions types generates by specific calls to createAction. The createAction was used in old Redux now we use createAsyncThunk that does something similar, more importantly is still generating an action. Therefore makes sense to use here.
+
+- The extraReducers property comes with what is called lifeCycle actions...which is just a fancy way of saying it is ready to handle the three stages of a promise, namely: pending, fulfilled, rejected. So go ahead and in your cartSlice, after your reducers property, call the extraReducers property.
+
+- The way to access it is by putting inside the extraReducers object the name of the action we assigned in the first argument of the createAsyncThunk. In our case that is getCartItems. There's a special syntax for it and it is the fact that it needs to be inside brackets. And inside the same brackets, next to the name of the function, we will define what lifeCycle we are handling. The first cycle of a promise is the pending state, so let's handle that first by saying \[getCatItems.pending\]
+
+- And now same as we have been doing with our normal reducers, we can access the state after the colon! Because we are handling pending first, let's handle just the loading state in this first stage.
+
+- To handle the other cycles, well, syntax is the same all we are changing is the state. So go ahead and copy paste that and make sure that after the name of the action, you replace pending with fulfilled and rejected respectively. Our fulfilled cycle will also take action on top of the state as argument. Why? Well, that has been explained before. So now we are going tom handle not only the isLoading to false, also need to modify the cartItems state to whatever the response from this async call will be. So go ahead and define the value of state.cartItems to action.payload
+
+- Now you will notice that if you try to export the function inside your destructured exports at the end of the file, you will get an error saying it has already been defined. Because indeed, we already did that. So to fix this go ahead and add export directly to the variable that's holding the function.
+
+- Navigate to the file where you want to use this async function and import it. In our case that is app.js and it is coming from features/cart. We also want to check if the page is loading, because remember, our thunk is changing that state. Go ahead and grab it from the store in the useSelector you already have there.
+
+- So far so good. Now we need to invoke our thunk upon first render. So let's create another useEffect that will handle that. Now refresh the page and see your new data in action!
+
+12. MORE createAsyncThunk OPTIONS
+
+- See the commented lines in cartSlice. We used axios to handle errors properly because fetch doesn't handle 404 errors.
+
+- extraReducers functionality is the same, but we make our createAsyncThunk a promise based function using async/await functionality with axios. Remember we can also pass arguments to the callback function in the createAsyncThunk.
+
+- we can also access the thunkAPI (can be any name, it is just best practice to call it as such) which is a massive object that provides a lot more options. For example the getState() of the thunkAPI give us access to the ENTIRE state of the application and we can manipulate it from a whole different slice even if it is not in our current one, which is something rather impressive.
+
+- thunkAPI also let us handle rejection messages that will be send as an action and we can modify our state to show the message to the user. In this case we are login the messsage to the console, but the functionality is still available.
