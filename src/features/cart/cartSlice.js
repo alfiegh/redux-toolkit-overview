@@ -12,25 +12,25 @@ const initialState = {
 
 const url = 'MOCK_DATA.json';
 
-// export const getCartItems = createAsyncThunk('cart/getCartItems', () => {
-//   return fetch(url)
-//     .then((res) => res.json())
-//     .catch((err) => console.log(err));
-// });
+export const getCartItems = createAsyncThunk('cart/getCartItems', () => {
+  return fetch(url)
+    .then((res) => res.json())
+    .catch((err) => console.log(err));
+});
 
-export const getCartItems = createAsyncThunk(
-  'cart/getCartItems',
-  async (_, thunkAPI) => {
-    try {
-      console.log(thunkAPI);
-      console.log(thunkAPI.getState());
-      const res = await axios(url);
-      return res.data;
-    } catch (err) {
-      return thunkAPI.rejectWithValue('Something went wrong, try again!');
-    }
-  }
-);
+// export const getCartItems = createAsyncThunk(
+//   'cart/getCartItems',
+//   async (_, thunkAPI) => {
+//     try {
+//       console.log(thunkAPI);
+//       console.log(thunkAPI.getState());
+//       const res = await axios(url);
+//       return res.data;
+//     } catch (err) {
+//       return thunkAPI.rejectWithValue('Something went wrong, try again!');
+//     }
+//   }
+// );
 
 const cartSlice = createSlice({
   name: 'cart',
